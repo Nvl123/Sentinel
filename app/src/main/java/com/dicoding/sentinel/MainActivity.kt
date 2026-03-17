@@ -50,6 +50,11 @@ import com.dicoding.sentinel.widget.StreakWidgetProvider
 enum class Screen { Dashboard, Reports, Settings }
 
 class MainActivity : ComponentActivity() {
+    override fun onStart() {
+        super.onStart()
+        StreakWidgetProvider.triggerUpdate(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,9 +62,6 @@ class MainActivity : ComponentActivity() {
         val preferences = SentinelPreference(this)
         val database = SentinelDatabase.getDatabase(this)
         val relapseDao = database.relapseDao()
-
-        // Initial widget update
-        StreakWidgetProvider.triggerUpdate(this)
 
         setContent {
             val viewModel: FirewallViewModel = viewModel()

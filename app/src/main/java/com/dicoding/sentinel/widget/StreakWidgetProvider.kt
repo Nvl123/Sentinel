@@ -43,7 +43,7 @@ class StreakWidgetProvider : AppWidgetProvider() {
         val elapsedMillis = System.currentTimeMillis() - streakStartTime
         val baseTime = android.os.SystemClock.elapsedRealtime() - elapsedMillis
 
-        views.setChronometer(R.id.widget_chronometer, baseTime, null, false)
+        views.setChronometer(R.id.widget_chronometer, baseTime, null, true)
         views.setChronometerCountDown(R.id.widget_chronometer, false)
 
         // Opening the app on click
