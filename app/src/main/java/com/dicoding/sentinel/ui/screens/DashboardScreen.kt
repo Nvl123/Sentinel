@@ -3,6 +3,7 @@ package com.dicoding.sentinel.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
@@ -52,37 +54,61 @@ fun DashboardScreen(
     ) {
         Text(
             text = "SENTINEL",
-            style = MaterialTheme.typography.headlineLarge.copy(
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 4.sp,
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Black,
+                letterSpacing = 2.sp,
                 color = MaterialTheme.colorScheme.primary
             )
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         Text(
             text = "Personal Habit Firewall",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
         )
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        // Streak Display
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = if (isLoaded) "${days}d ${hours}h ${minutes}m ${seconds}s" else "--d --h --m --s",
-                style = MaterialTheme.typography.displayMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+        // Streak Display (M3 Primary Container)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            shadowElevation = 2.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 40.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = if (isLoaded) {
+                        "${days}d ${hours}h ${minutes}m ${seconds}s"
+                    } else {
+                        "--d --h --m --s"
+                    },
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
-            )
-            Text(
-                text = "CLEAN STREAK",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "CURRENT CLEAN STREAK",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(80.dp))
@@ -91,44 +117,39 @@ fun DashboardScreen(
         Button(
             onClick = onActivateFirewall,
             modifier = Modifier
-                .size(220.dp),
+                .size(200.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent
+                containerColor = MaterialTheme.colorScheme.primary
             ),
-            contentPadding = PaddingValues(0.dp)
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 8.dp,
+                pressedElevation = 2.dp
+            )
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                Color(0xFFFF0055).copy(alpha = 0.8f),
-                                Color(0xFF880022)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "ACTIVATE\nFIREWALL",
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        color = Color.White
-                    )
+            Text(
+                text = "ACTIVATE\nFIREWALL",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Black,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
-            }
+            )
         }
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        TextButton(onClick = onReportRelapse) {
+        TextButton(
+            onClick = onReportRelapse,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            )
+        ) {
             Text(
                 text = "REPORT RELAPSE",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }

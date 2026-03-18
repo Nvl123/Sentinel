@@ -17,6 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -105,30 +108,33 @@ class MainActivity : ComponentActivity() {
             SentinelTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (isLoggedIn && !firewallState.isActive) {
-                            NavigationBar {
-                                NavigationBarItem(
-                                    selected = currentScreen == Screen.Dashboard,
-                                    onClick = { currentScreen = Screen.Dashboard },
-                                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
-                                    label = { Text("Streak") }
-                                )
-                                NavigationBarItem(
-                                    selected = currentScreen == Screen.Reports,
-                                    onClick = { currentScreen = Screen.Reports },
-                                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                                    label = { Text("Reports") }
-                                )
-                                NavigationBarItem(
-                                    selected = currentScreen == Screen.Settings,
-                                    onClick = { currentScreen = Screen.Settings },
-                                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-                                    label = { Text("Settings") }
-                                )
-                            }
+                bottomBar = {
+                    if (isLoggedIn && !firewallState.isActive) {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 3.dp
+                        ) {
+                            NavigationBarItem(
+                                selected = currentScreen == Screen.Dashboard,
+                                onClick = { currentScreen = Screen.Dashboard },
+                                icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                                label = { Text("Streak") }
+                            )
+                            NavigationBarItem(
+                                selected = currentScreen == Screen.Reports,
+                                onClick = { currentScreen = Screen.Reports },
+                                icon = { Icon(Icons.Default.Info, contentDescription = null) },
+                                label = { Text("Reports") }
+                            )
+                            NavigationBarItem(
+                                selected = currentScreen == Screen.Settings,
+                                onClick = { currentScreen = Screen.Settings },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                                label = { Text("Settings") }
+                            )
                         }
                     }
+                }
                 ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         if (!isLoggedIn) {

@@ -9,12 +9,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.dicoding.sentinel.domain.model.RelapseLog
 import com.dicoding.sentinel.domain.model.UrgeLog
+import com.dicoding.sentinel.ui.components.StreakCalendar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,6 +55,22 @@ fun ReportScreen(
         item {
             StreakSummarySection(days, hours)
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // Streak Calendar Section
+        item {
+            Text(
+                text = "STREAK VISUALIZATION",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            StreakCalendar(
+                relapses = relapses,
+                streakStartTime = streakStartTime,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
 
         // Simple Visualization Section
@@ -106,34 +125,45 @@ fun ReportScreen(
 fun StreakSummarySection(days: Long, hours: Long) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+        shape = RoundedCornerShape(28.dp),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             Text(
-                text = "CURRENT STREAK",
+                text = "CURRENT CLEAN STREAK",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = days.toString(),
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black)
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 )
                 Text(
                     text = "d ",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
                 Text(
                     text = hours.toString(),
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black)
+                    style = MaterialTheme.typography.displayLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 )
                 Text(
                     text = "h",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
         }
@@ -147,67 +177,89 @@ fun UrgeVisualizationSection(urgeLogs: List<UrgeLog>, relapses: List<RelapseLog>
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        shape = RoundedCornerShape(28.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shadowElevation = 1.dp
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Text(text = "FIREWALL EFFICIENCY", style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = "FIREWALL EFFICIENCY", 
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "${(successRate * 100).toInt()}%",
-                    style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Black)
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    Text(text = "${urgeLogs.size} Urges Defeated", color = MaterialTheme.colorScheme.primary)
-                    Text(text = "${relapses.size} Broken Wall", color = MaterialTheme.colorScheme.error)
+                    Text(text = "${urgeLogs.size} Urges Defeated", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                    Text(text = "${relapses.size} Broken Wall", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
             
-            // Simple Bar Chart Placeholder
-            Box(
+            // Progress Bar
+            LinearProgressIndicator(
+                progress = { successRate },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp)
-                    .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(successRate)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp))
-                )
-            }
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f),
+            )
         }
     }
 }
 
 @Composable
 fun ActivityCard(title: String, subtitle: String, description: String, color: Color) {
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            .padding(vertical = 6.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 2.dp,
+        tonalElevation = 1.dp
     ) {
         Row(modifier = Modifier.padding(16.dp)) {
             Box(
                 modifier = Modifier
-                    .size(4.dp, 40.dp)
-                    .background(color, RoundedCornerShape(2.dp))
+                    .size(6.dp, 48.dp)
+                    .background(color, RoundedCornerShape(3.dp))
+                    .align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
-                Text(text = title, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
-                Text(text = subtitle, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                Text(
+                    text = title, 
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = subtitle, 
+                    style = MaterialTheme.typography.labelSmall, 
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 if (description.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = description, style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = description, 
+                        style = MaterialTheme.typography.bodyMedium, 
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    )
                 }
             }
         }

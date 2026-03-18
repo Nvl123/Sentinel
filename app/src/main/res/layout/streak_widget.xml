@@ -24,12 +24,72 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <Chronometer
-            android:id="@+id/widget_chronometer"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/widget_day_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Chronometer
+                android:id="@+id/widget_chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/widget_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CLEAN STREAK"
+            android:textColor="#00D2FF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="12dp">
+
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="sn" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="sl" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="rb" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="km" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="jm" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="sb" />
+            <TextView android:layout_width="28dp" android:layout_height="wrap_content" android:layout_margin="2dp" android:gravity="center" android:textSize="10sp" android:textColor="#FFFFFF" android:alpha="0.6" android:text="mg" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="2dp">
+
+            <TextView android:id="@+id/widget_indicator_mon" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_tue" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_wed" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_thu" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_fri" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_sat" style="@style/WidgetDayStyle" android:text="" />
+            <TextView android:id="@+id/widget_indicator_sun" style="@style/WidgetDayStyle" android:text="" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

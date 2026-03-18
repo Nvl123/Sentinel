@@ -7,41 +7,69 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-val DeepNavy = Color(0xFF0F172A)
-val Charcoal = Color(0xFF1E293B)
-val NeonCyan = Color(0xFF00D2FF)
-val ElectricBlue = Color(0xFF3B82F6)
-val ErrorRed = Color(0xFFEF4444)
-val SurfaceGray = Color(0xFF334155)
+val MdPrimary = Color(0xFF0061A4)
+val MdOnPrimary = Color(0xFFFFFFFF)
+val MdPrimaryContainer = Color(0xFFD1E4FF)
+val MdOnPrimaryContainer = Color(0xFF001D36)
 
-private val DarkColorScheme = darkColorScheme(
-    primary = NeonCyan,
-    secondary = ElectricBlue,
-    tertiary = SurfaceGray,
-    background = DeepNavy,
-    surface = Charcoal,
-    onPrimary = Color.Black,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White,
-    error = ErrorRed,
-    onError = Color.White
-)
+val MdSecondary = Color(0xFF535F70)
+val MdOnSecondary = Color(0xFFFFFFFF)
+val MdSecondaryContainer = Color(0xFFD7E3F7)
+val MdOnSecondaryContainer = Color(0xFF101C2B)
+
+val MdTertiary = Color(0xFF6B5778)
+val MdOnTertiary = Color(0xFFFFFFFF)
+val MdTertiaryContainer = Color(0xFFF2DAFF)
+val MdOnTertiaryContainer = Color(0xFF251431)
+
+val MdBackground = Color(0xFFFDFCFF)
+val MdOnBackground = Color(0xFF1A1C1E)
+val MdSurface = Color(0xFFFDFCFF)
+val MdOnSurface = Color(0xFF1A1C1E)
+val MdSurfaceVariant = Color(0xFFDFE2EB)
+val MdOnSurfaceVariant = Color(0xFF43474E)
+
+val MdError = Color(0xFFBA1A1A)
+val MdOnError = Color(0xFFFFFFFF)
 
 private val LightColorScheme = lightColorScheme(
-    primary = ElectricBlue,
-    secondary = NeonCyan,
-    tertiary = SurfaceGray,
-    background = Color.White,
-    surface = Color(0xFFF1F5F9),
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onTertiary = Color.White,
-    onBackground = DeepNavy,
-    onSurface = DeepNavy,
-    error = ErrorRed,
-    onError = Color.White
+    primary = MdPrimary,
+    onPrimary = MdOnPrimary,
+    primaryContainer = MdPrimaryContainer,
+    onPrimaryContainer = MdOnPrimaryContainer,
+    secondary = MdSecondary,
+    onSecondary = MdOnSecondary,
+    secondaryContainer = MdSecondaryContainer,
+    onSecondaryContainer = MdOnSecondaryContainer,
+    tertiary = MdTertiary,
+    onTertiary = MdOnTertiary,
+    tertiaryContainer = MdTertiaryContainer,
+    onTertiaryContainer = MdOnTertiaryContainer,
+    background = MdBackground,
+    onBackground = MdOnBackground,
+    surface = MdSurface,
+    onSurface = MdOnSurface,
+    surfaceVariant = MdSurfaceVariant,
+    onSurfaceVariant = MdOnSurfaceVariant,
+    error = MdError,
+    onError = MdOnError
+)
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFF9ECAFF),
+    onPrimary = Color(0xFF003258),
+    primaryContainer = Color(0xFF00497D),
+    onPrimaryContainer = MdPrimaryContainer,
+    secondary = Color(0xFFBBC7DB),
+    onSecondary = Color(0xFF253140),
+    secondaryContainer = Color(0xFF3B4858),
+    onSecondaryContainer = MdSecondaryContainer,
+    background = MdOnBackground,
+    onBackground = MdBackground,
+    surface = MdOnBackground,
+    onSurface = MdBackground,
+    surfaceVariant = MdOnSurfaceVariant,
+    onSurfaceVariant = MdSurfaceVariant,
 )
 
 @Composable

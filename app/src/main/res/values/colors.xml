@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="sentinel_blue">#00D2FF</color>
+    <color name="streak_green">#4CAF50</color>
 </resources>

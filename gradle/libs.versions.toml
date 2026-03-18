@@ -16,8 +16,10 @@ lifecycle = "2.9.0-alpha11"
 navigation = "2.8.8"
 room = "2.6.1"
 ksp = "2.0.21-1.0.27"
+desugar = "2.1.4"
 
 [libraries]
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
