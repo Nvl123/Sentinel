@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
 
             val firewallState by viewModel.uiState.collectAsState()
             val savedStreakStartTime by preferences.streakStartTime.collectAsState(initial = null)
+            val savedLongestStreak by preferences.longestStreak.collectAsState(initial = 0L)
             val isLoggedIn by preferences.isLoggedIn.collectAsState(initial = false)
             val allRelapses by relapseViewModel.allRelapses.collectAsState()
             val allUrgeLogs by relapseViewModel.allUrgeLogs.collectAsState()
@@ -157,7 +158,8 @@ class MainActivity : ComponentActivity() {
                                     ReportScreen(
                                         relapses = allRelapses,
                                         urgeLogs = allUrgeLogs,
-                                        streakStartTime = savedStreakStartTime ?: System.currentTimeMillis()
+                                        streakStartTime = savedStreakStartTime ?: System.currentTimeMillis(),
+                                        savedLongestStreak = savedLongestStreak
                                     )
                                 }
                                 Screen.Settings -> {

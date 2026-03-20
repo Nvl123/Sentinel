@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.dicoding.sentinel.domain.model.RelapseLog
 import com.dicoding.sentinel.domain.model.UrgeLog
 import com.dicoding.sentinel.ui.components.StreakCalendar
+import com.dicoding.sentinel.util.StreakUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,7 +26,8 @@ import java.util.*
 fun ReportScreen(
     relapses: List<RelapseLog>,
     urgeLogs: List<UrgeLog>,
-    streakStartTime: Long
+    streakStartTime: Long,
+    savedLongestStreak: Long
 ) {
     val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
     val currentTime = System.currentTimeMillis()
@@ -53,7 +55,8 @@ fun ReportScreen(
 
         // Streak Summary Section
         item {
-            StreakSummarySection(days, hours)
+            val (longestDays, longestHours) = StreakUtils.getLongestStreak(relapses, streakStartTime, savedLongestStreak)
+            StreakSummarySection(days, hours, longestDays, longestHours)
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -122,7 +125,7 @@ fun ReportScreen(
 }
 
 @Composable
-fun StreakSummarySection(days: Long, hours: Long) {
+fun StreakSummarySection(days: Long, hours: Long, longestDays: Long, longestHours: Long) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -164,6 +167,52 @@ fun StreakSummarySection(days: Long, hours: Long) {
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
                     modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f))
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "LONGEST STREAK",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(
+                    text = longestDays.toString(),
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+                Text(
+                    text = "d ",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                Text(
+                    text = longestHours.toString(),
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+                Text(
+                    text = "h",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
         }

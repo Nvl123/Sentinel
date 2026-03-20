@@ -57,4 +57,37 @@ object StreakUtils {
         FUTURE,  // Future day
         NONE     // Before app usage started
     }
+
+    /**
+     * Calculates the longest streak based on relapses and the current streak.
+     * @return A Pair containing (days, hours) of the longest streak.
+     */
+    fun getLongestStreak(
+        relapses: List<RelapseLog>,
+        currentStreakStartTime: Long,
+        savedLongestStreak: Long
+    ): Pair<Long, Long> {
+        var maxDiff = savedLongestStreak
+
+        if (relapses.isNotEmpty()) {
+            val sortedRelapses = relapses.sortedBy { it.timestamp }
+            for (i in 0 until sortedRelapses.size - 1) {
+                val diff = sortedRelapses[i + 1].timestamp - sortedRelapses[i].timestamp
+                if (diff > maxDiff) {
+                    maxDiff = diff
+                }
+            }
+        }
+        
+        val currentStreak = System.currentTimeMillis() - currentStreakStartTime
+        if (currentStreak > maxDiff) {
+            maxDiff = currentStreak
+        }
+
+        val maxDiffCoerced = maxDiff.coerceAtLeast(0)
+        val days = maxDiffCoerced / (24 * 3600 * 1000)
+        val hours = (maxDiffCoerced % (24 * 3600 * 1000)) / (3600 * 1000)
+
+        return Pair(days, hours)
+    }
 }

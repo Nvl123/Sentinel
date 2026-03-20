@@ -16,6 +16,7 @@ class SentinelPreference(private val context: Context) {
 
     companion object {
         private val STREAK_START_KEY = longPreferencesKey("streak_start_time")
+        private val LONGEST_STREAK_KEY = longPreferencesKey("longest_streak")
         private val URGE_DEFEATED_COUNT = longPreferencesKey("urge_defeated_count")
         private val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         private val ACTIVE_PROTOCOL_ID = longPreferencesKey("active_protocol_id")
@@ -26,6 +27,10 @@ class SentinelPreference(private val context: Context) {
 
     val streakStartTime: Flow<Long?> = context.dataStore.data.map { preferences ->
         preferences[STREAK_START_KEY]
+    }
+
+    val longestStreak: Flow<Long> = context.dataStore.data.map { preferences ->
+        preferences[LONGEST_STREAK_KEY] ?: 0L
     }
 
     val urgeDefeatedCount: Flow<Long> = context.dataStore.data.map { preferences ->
@@ -58,6 +63,12 @@ class SentinelPreference(private val context: Context) {
 
     suspend fun resetStreak() {
         context.dataStore.edit { preferences ->
+            val start = preferences[STREAK_START_KEY] ?: System.currentTimeMillis()
+            val currentStreak = System.currentTimeMillis() - start
+            val maxStreak = preferences[LONGEST_STREAK_KEY] ?: 0L
+            if (currentStreak > maxStreak) {
+                preferences[LONGEST_STREAK_KEY] = currentStreak
+            }
             preferences[STREAK_START_KEY] = System.currentTimeMillis()
         }
     }
@@ -94,6 +105,7 @@ class SentinelPreference(private val context: Context) {
     suspend fun clearAllData() {
         context.dataStore.edit { preferences ->
             preferences.remove(STREAK_START_KEY)
+            preferences.remove(LONGEST_STREAK_KEY)
             preferences.remove(URGE_DEFEATED_COUNT)
             preferences.remove(ACTIVE_PROTOCOL_ID)
             preferences.remove(USED_PROTOCOL_IDS_STR)
