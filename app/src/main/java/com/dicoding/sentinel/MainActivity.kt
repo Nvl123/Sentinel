@@ -86,10 +86,30 @@ class MainActivity : ComponentActivity() {
             // Firewall persistence flows
             val activeProtocolId by preferences.activeProtocolId.collectAsState(initial = null)
             val usedProtocolsStr by preferences.usedProtocolIdsStr.collectAsState(initial = "")
+            
+            val isAppLockEnabled by preferences.isAppLockEnabled.collectAsState(initial = false)
+            val lockedAppsStr by preferences.lockedAppsStr.collectAsState(initial = "")
+            val lockedApps = remember(lockedAppsStr) { 
+                lockedAppsStr.split(",").filter { it.isNotBlank() }.toSet() 
+            }
 
             val scope = rememberCoroutineScope()
             var showRelapseDialog by remember { mutableStateOf(false) }
             var currentScreen by remember { mutableStateOf(Screen.Dashboard) }
+
+            // Handle AppMonitorService Lifecycle
+            LaunchedEffect(isAppLockEnabled) {
+                val intent = android.content.Intent(this@MainActivity, AppMonitorService::class.java)
+                if (isAppLockEnabled) {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        startForegroundService(intent)
+                    } else {
+                        startService(intent)
+                    }
+                } else {
+                    stopService(intent)
+                }
+            }
 
             // Restore firewall state on launch
             LaunchedEffect(activeProtocolId, usedProtocolsStr) {
@@ -164,6 +184,15 @@ class MainActivity : ComponentActivity() {
                                 }
                                 Screen.Settings -> {
                                     SettingsScreen(
+                                        context = this@MainActivity,
+                                        isAppLockEnabled = isAppLockEnabled,
+                                        lockedApps = lockedApps,
+                                        onToggleAppLock = { enabled ->
+                                            scope.launch { preferences.setAppLockEnabled(enabled) }
+                                        },
+                                        onUpdateLockedApps = { apps ->
+                                            scope.launch { preferences.setLockedApps(apps.joinToString(",")) }
+                                        },
                                         onClearData = {
                                             relapseViewModel.clearAllData()
                                             scope.launch { 

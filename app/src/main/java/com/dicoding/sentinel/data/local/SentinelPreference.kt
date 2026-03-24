@@ -23,6 +23,8 @@ class SentinelPreference(private val context: Context) {
         private val FIREWALL_START_TIME = longPreferencesKey("firewall_start_time")
         private val USED_PROTOCOL_IDS = longPreferencesKey("used_protocol_ids") // Stored as bitmask or comma string, but let's use a string for simplicity
         private val USED_PROTOCOL_IDS_STR = androidx.datastore.preferences.core.stringPreferencesKey("used_protocol_ids_str")
+        private val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
+        private val LOCKED_APPS_STR = androidx.datastore.preferences.core.stringPreferencesKey("locked_apps_str")
     }
 
     val streakStartTime: Flow<Long?> = context.dataStore.data.map { preferences ->
@@ -47,6 +49,14 @@ class SentinelPreference(private val context: Context) {
 
     val usedProtocolIdsStr: Flow<String> = context.dataStore.data.map { preferences ->
         preferences[USED_PROTOCOL_IDS_STR] ?: ""
+    }
+
+    val isAppLockEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[APP_LOCK_ENABLED] ?: false
+    }
+
+    val lockedAppsStr: Flow<String> = context.dataStore.data.map { preferences ->
+        preferences[LOCKED_APPS_STR] ?: ""
     }
 
     suspend fun setLoggedIn(loggedIn: Boolean) {
@@ -109,6 +119,20 @@ class SentinelPreference(private val context: Context) {
             preferences.remove(URGE_DEFEATED_COUNT)
             preferences.remove(ACTIVE_PROTOCOL_ID)
             preferences.remove(USED_PROTOCOL_IDS_STR)
+            preferences.remove(APP_LOCK_ENABLED)
+            preferences.remove(LOCKED_APPS_STR)
+        }
+    }
+
+    suspend fun setAppLockEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[APP_LOCK_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setLockedApps(packageNames: String) {
+        context.dataStore.edit { preferences ->
+            preferences[LOCKED_APPS_STR] = packageNames
         }
     }
 }
