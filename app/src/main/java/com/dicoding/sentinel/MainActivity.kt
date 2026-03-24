@@ -48,9 +48,10 @@ import android.os.VibratorManager
 
 import androidx.compose.material.icons.filled.Settings
 import com.dicoding.sentinel.ui.screens.SettingsScreen
+import com.dicoding.sentinel.ui.screens.LevelProgressionScreen
 import com.dicoding.sentinel.widget.StreakWidgetProvider
 
-enum class Screen { Dashboard, Reports, Settings }
+enum class Screen { Dashboard, Reports, Settings, LevelProgression }
 
 class MainActivity : ComponentActivity() {
     override fun onStart() {
@@ -96,6 +97,12 @@ class MainActivity : ComponentActivity() {
             val scope = rememberCoroutineScope()
             var showRelapseDialog by remember { mutableStateOf(false) }
             var currentScreen by remember { mutableStateOf(Screen.Dashboard) }
+
+            // Lakukan kompresi badge di background saat aplikasi dibuka
+            val context = androidx.compose.ui.platform.LocalContext.current
+            LaunchedEffect(Unit) {
+                com.dicoding.sentinel.util.GamificationUtils.compressAndCacheBadges(context)
+            }
 
             // Handle AppMonitorService Lifecycle
             LaunchedEffect(isAppLockEnabled) {
@@ -182,17 +189,19 @@ class MainActivity : ComponentActivity() {
                                         savedLongestStreak = savedLongestStreak
                                     )
                                 }
-                                Screen.Settings -> {
+                                 Screen.Settings -> {
                                     SettingsScreen(
                                         context = this@MainActivity,
                                         isAppLockEnabled = isAppLockEnabled,
                                         lockedApps = lockedApps,
+                                        streakStartTime = savedStreakStartTime,
                                         onToggleAppLock = { enabled ->
                                             scope.launch { preferences.setAppLockEnabled(enabled) }
                                         },
                                         onUpdateLockedApps = { apps ->
                                             scope.launch { preferences.setLockedApps(apps.joinToString(",")) }
                                         },
+                                        onViewLevelProgression = { currentScreen = Screen.LevelProgression },
                                         onClearData = {
                                             relapseViewModel.clearAllData()
                                             scope.launch { 
@@ -200,6 +209,11 @@ class MainActivity : ComponentActivity() {
                                                 StreakWidgetProvider.triggerUpdate(this@MainActivity)
                                             }
                                         }
+                                    )
+                                }
+                                Screen.LevelProgression -> {
+                                    LevelProgressionScreen(
+                                        onBack = { currentScreen = Screen.Settings }
                                     )
                                 }
                             }

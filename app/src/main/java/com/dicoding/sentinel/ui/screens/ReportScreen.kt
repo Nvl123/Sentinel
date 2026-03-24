@@ -133,41 +133,65 @@ fun StreakSummarySection(days: Long, hours: Long, longestDays: Long, longestHour
         shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Text(
-                text = "CURRENT CLEAN STREAK",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(verticalAlignment = Alignment.Bottom) {
-                Text(
-                    text = days.toString(),
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.primary
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "CURRENT CLEAN STREAK",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
-                )
-                Text(
-                    text = "d ",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-                Text(
-                    text = hours.toString(),
-                    style = MaterialTheme.typography.displayLarge.copy(
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.primary
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = days.toString(),
+                            style = MaterialTheme.typography.displayLarge.copy(
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Text(
+                            text = "d ",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                        Text(
+                            text = hours.toString(),
+                            style = MaterialTheme.typography.displayLarge.copy(
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Text(
+                            text = "h",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
+                }
+
+                val level = com.dicoding.sentinel.util.GamificationUtils.getLevel(days)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = level.badgeResId),
+                        contentDescription = "Level Badge",
+                        modifier = Modifier.size(80.dp)
                     )
-                )
-                Text(
-                    text = "h",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
+                    Text(
+                        text = level.name,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

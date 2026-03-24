@@ -28,16 +28,18 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.foundation.Image
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun SettingsScreen(
     context: Context,
     isAppLockEnabled: Boolean,
     lockedApps: Set<String>,
+    streakStartTime: Long?,
     onToggleAppLock: (Boolean) -> Unit,
     onUpdateLockedApps: (Set<String>) -> Unit,
+    onViewLevelProgression: () -> Unit,
     onClearData: () -> Unit
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -61,144 +63,250 @@ fun SettingsScreen(
         }
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp)
-            .padding(top = 16.dp)
+            .padding(horizontal = 24.dp),
+        contentPadding = PaddingValues(top = 40.dp, bottom = 40.dp)
     ) {
-        Text(
-            text = "SETTINGS",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.primary
+        item {
+            Text(
+                text = "SETTINGS",
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
-        )
+            Spacer(modifier = Modifier.height(32.dp))
+        }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        // LEVEL INFO SECTION
+        if (streakStartTime != null) {
+            val days = (System.currentTimeMillis() - streakStartTime) / (24 * 3600 * 1000)
+            val level = com.dicoding.sentinel.util.GamificationUtils.getLevel(days)
+            
+            item {
+                val currentBadge = remember(level.badgeResId) {
+                    val cachedFile = com.dicoding.sentinel.util.GamificationUtils.getCompressedBadgeFile(context, level.badgeResId)
+                    if (cachedFile != null) {
+                        android.graphics.BitmapFactory.decodeFile(cachedFile.absolutePath)?.asImageBitmap()
+                            ?: com.dicoding.sentinel.util.GamificationUtils.decodeSampledBitmapFromResource(
+                                context.resources,
+                                level.badgeResId,
+                                256,
+                                256
+                            ).asImageBitmap()
+                    } else {
+                        com.dicoding.sentinel.util.GamificationUtils.decodeSampledBitmapFromResource(
+                            context.resources,
+                            level.badgeResId,
+                            256,
+                            256
+                        ).asImageBitmap()
+                    }
+                }
 
-        // SECURITY & APP LOCK SECTION
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            bitmap = currentBadge,
+                            contentDescription = "Level Badge",
+                            modifier = Modifier
+                                .size(64.dp)
+                                .padding(4.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(
+                                text = "CURRENT LEVEL",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = level.name,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            
+            
+            item {
                 Text(
-                    text = "SECURITY & APP LOCK",
+                    text = "GAMIFICATION",
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-                Row(
+                
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    onClick = onViewLevelProgression,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            androidx.compose.material.icons.Icons.Default.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
                         Text(
-                            text = "Enable App Lock",
+                            text = "Lihat Semua Level & Emblem",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = "Lock selected apps with a verification code.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
                     }
-                    Switch(
-                        checked = isAppLockEnabled,
-                        onCheckedChange = { 
-                            if (it && (!hasUsageStats || !hasOverlay)) {
-                                // Request permissions if not granted
-                                if (!hasUsageStats) {
-                                    context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
-                                } else if (!hasOverlay) {
-                                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
-                                    context.startActivity(intent.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
-                                }
-                            } else {
-                                onToggleAppLock(it)
-                            }
-                        }
-                    )
                 }
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
 
-                if (isAppLockEnabled) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+        // SECURITY & APP LOCK SECTION
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = "SECURITY & APP LOCK",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { showAppSelectionDialog = true },
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Locked Applications",
+                                text = "Enable App Lock",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
-                            if (lockedApps.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                LockedAppsIconsRow(context, lockedApps)
-                            } else {
-                                Text(
-                                    text = "No apps selected",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                                )
-                            }
+                            Text(
+                                text = "Lock selected apps with a verification code.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
                         }
-                        Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
+                        Switch(
+                            checked = isAppLockEnabled,
+                            onCheckedChange = { 
+                                if (it && (!hasUsageStats || !hasOverlay)) {
+                                    // Request permissions if not granted
+                                    if (!hasUsageStats) {
+                                        context.startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+                                    } else if (!hasOverlay) {
+                                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
+                                        context.startActivity(intent.apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+                                    }
+                                } else {
+                                    onToggleAppLock(it)
+                                }
+                            }
+                        )
+                    }
+
+                    if (isAppLockEnabled) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showAppSelectionDialog = true },
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Locked Applications",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                if (lockedApps.isNotEmpty()) {
+                                    Spacer(modifier = Modifier.height(12.dp))
+                                    LockedAppsIconsRow(context, lockedApps)
+                                } else {
+                                    Text(
+                                        text = "No apps selected",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    )
+                                }
+                            }
+                            Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
+                        }
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Text(
-                    text = "DATA MANAGEMENT",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Text(
-                    text = "Hapus Semua Laporan",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Ini akan menghapus semua riwayat relapse dan data urge yang berhasil dilewati, serta mereset statistik.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Button(
-                    onClick = { showConfirmDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("RESET SEMUA DATA", fontWeight = FontWeight.Bold)
+        // DATA MANAGEMENT SECTION
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.padding(24.dp)) {
+                    Text(
+                        text = "DATA MANAGEMENT",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        text = "Hapus Semua Laporan",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Ini akan menghapus semua riwayat relapse dan data urge yang berhasil dilewati, serta mereset statistik.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Button(
+                        onClick = { showConfirmDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("RESET SEMUA DATA", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
@@ -394,6 +502,8 @@ fun getAppIcon(packageManager: PackageManager, packageName: String): ImageBitmap
         null
     }
 }
+
+
 
 fun checkUsageStatsPermission(context: Context): Boolean {
     val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager

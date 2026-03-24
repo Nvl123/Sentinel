@@ -75,6 +75,32 @@ fun DashboardScreen(
 
         Spacer(modifier = Modifier.height(64.dp))
 
+        // Level Badge and Title
+        if (isLoaded) {
+            val level = com.dicoding.sentinel.util.GamificationUtils.getLevel(days)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(bottom = 32.dp)
+            ) {
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = level.badgeResId),
+                    contentDescription = "Level Badge",
+                    modifier = Modifier
+                        .size(160.dp)
+                        .padding(8.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "LEVEL: ${level.name}",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        letterSpacing = 1.sp
+                    )
+                )
+            }
+        }
+
         // Streak Display (M3 Primary Container)
         Surface(
             modifier = Modifier.fillMaxWidth(),
